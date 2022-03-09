@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="notifier" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="com.totango.notifier.server.NotifierApplicationKt" />
+    <module name="notifier-server" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
