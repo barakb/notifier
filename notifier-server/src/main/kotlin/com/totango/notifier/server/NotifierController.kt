@@ -3,6 +3,7 @@ package com.totango.notifier.server
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cloud.sleuth.annotation.ContinueSpan
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
@@ -19,6 +20,7 @@ class NotifierController(
     val properties: NotifierServerProperties
 ) {
 
+    @ContinueSpan
     @MessageMapping("notify")
     fun notify(notification: String): Mono<Void> {
         logger.info("got notification $notification")
@@ -26,11 +28,13 @@ class NotifierController(
     }
 
 
+    @ContinueSpan
     @MessageMapping("oneway")
     fun oneway(notification: String): Mono<Void> {
         return send(notification).then()
     }
 
+    @ContinueSpan
     @MessageMapping("subscribe")
     fun subscribe(pattern: String): Flux<String> {
         logger.info("got subscribe $pattern")

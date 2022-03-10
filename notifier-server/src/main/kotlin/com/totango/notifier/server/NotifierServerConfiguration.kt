@@ -4,6 +4,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import org.springframework.cloud.sleuth.instrument.kafka.TracingKafkaConsumerFactory
+import org.springframework.cloud.sleuth.instrument.kafka.TracingKafkaProducerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.kafka.receiver.KafkaReceiver
@@ -27,8 +29,8 @@ class NotifierServerConfiguration {
     }
 
     @Bean
-    fun sender(senderOptions: SenderOptions<String, String>): KafkaSender<String, String> =
-        KafkaSender.create(senderOptions)
+    fun sender(tracingKafkaProducerFactory: TracingKafkaProducerFactory, senderOptions: SenderOptions<String, String>): KafkaSender<String, String> =
+        KafkaSender.create(tracingKafkaProducerFactory, senderOptions)
 
     @Bean
     fun receiverOptions(properties: NotifierServerProperties): ReceiverOptions<String, String> {
@@ -43,7 +45,7 @@ class NotifierServerConfiguration {
     }
 
     @Bean
-    fun receiver(receiverOptions: ReceiverOptions<String, String>): KafkaReceiver<String, String> =
-        KafkaReceiver.create(receiverOptions)
+    fun receiver(tracingKafkaConsumerFactory: TracingKafkaConsumerFactory, receiverOptions: ReceiverOptions<String, String>): KafkaReceiver<String, String> =
+        KafkaReceiver.create(tracingKafkaConsumerFactory, receiverOptions)
 
 }

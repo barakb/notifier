@@ -7,18 +7,19 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 
-class NotifierImpl(private val requester: RSocketRequester) : Notifier {
-
+open class NotifierImpl(private val requester: RSocketRequester) : Notifier {
 
     override fun notify(notification: String): Mono<Void> =
         requester.route("notify")
             .data(notification.normalize())
             .retrieveMono()
 
+
     override fun oneway(notification: String): Mono<Void> =
         requester.route("oneway")
             .data(notification.normalize())
             .send()
+
 
 
     override fun subscribe(pattern: String): Flux<Event> =

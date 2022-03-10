@@ -21,15 +21,15 @@ class NotifierProcessor(
             .subscribe()
     }
 
-    private fun notifySubscribers(msg: String, subscribers: Subscribers) {
+    fun notifySubscribers(msg: String, subscribers: Subscribers) {
         val notification = msg.trim().split(Regex("\\s+"))
-        subscribers.all().stream().filter { subscription -> match(notification, subscription) }
+        subscribers.all().filter { subscription -> match(notification, subscription) }
             .forEach { subscription ->
                 emit(subscription, msg)
             }
     }
 
-    private fun emit(subscription: Subscription, notification: String) {
+    fun emit(subscription: Subscription, notification: String) {
         try {
             subscription.emitter.next(notification)
         } catch (e: Exception) {
