@@ -56,7 +56,7 @@ val disposable: Disposable = notifier.subscribe("*").doOnNext{
     logger.debug("shared     subscriber got $it")
 }.subscribe()
 ```
-2stand-alone subscription on the other hand is a bit heavier because each subscriber get its own Kafka reactive consumer, this subscriber gets events as fast as it consumes them but not faster (back-pressure is working).
+2. stand-alone subscription on the other hand is a bit heavier because each subscriber get its own Kafka reactive consumer, this subscriber gets events as fast as it consumes them but not faster (back-pressure is working).
 ```kotlin
 val standAloneDisposable: Disposable = notifier.subscribe("FOO *", SubscriberMode.Standalone).doOnNext{
     logger.debug("standalone subscriber got $it")
