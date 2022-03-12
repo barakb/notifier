@@ -11,12 +11,12 @@ class Subscribers {
     private val values: ConcurrentMap<String, Subscription> = ConcurrentHashMap()
 
     fun add(subscription: Subscription) {
-        logger.info("adding subscription $subscription")
+        logger.debug("adding a shared subscription $subscription")
         values[subscription.uid] = subscription
     }
 
     fun remove(subscription: Subscription) {
-        logger.info("removing subscription $subscription")
+        logger.debug("removing a shared subscription $subscription")
         values.remove(subscription.uid, subscription)
     }
 

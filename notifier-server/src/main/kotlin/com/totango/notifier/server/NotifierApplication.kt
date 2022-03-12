@@ -21,9 +21,9 @@ class NotifierApplication(val notifierProcessor: NotifierProcessor, val connecti
         val transport = connectionProperties.server.transport
         val port = connectionProperties.server.port
         val mappingPath = connectionProperties.server.mappingPath
-        logger.info("Event server ready $transport $port $mappingPath ")
-        logger.info("Zipkin             http://localhost:9411")
-        logger.info("Jaeger             http://localhost:16686")
+        logger.debug("Event server ready $transport $port $mappingPath ")
+        logger.debug("Zipkin             http://localhost:9411")
+        logger.debug("Jaeger             http://localhost:16686")
         notifierProcessor.process()
     }
 

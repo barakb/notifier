@@ -15,15 +15,16 @@ internal class MatcherTest {
     }
     @Test
     fun dontMatchShortNotification() {
-        assertThat(matcher.match(listOf("*"), listOf())).isFalse
         assertThat(matcher.match(listOf("?"), listOf())).isFalse
         assertThat(matcher.match(listOf("a"), listOf())).isFalse
     }
     @Test
     fun star() {
+        assertThat(matcher.match(listOf("*"), listOf())).isTrue
         assertThat(matcher.match(listOf("*"), listOf("a"))).isTrue
         assertThat(matcher.match(listOf("*"), listOf("*"))).isTrue
         assertThat(matcher.match(listOf("*"), listOf("a", "b"))).isTrue
+        assertThat(matcher.match(listOf("a", "*"), listOf("a"))).isTrue
     }
     @Test
     fun qm() {

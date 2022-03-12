@@ -16,12 +16,15 @@ import reactor.kafka.sender.SenderResult
 class NotifierController(
     val subscribers: Subscribers,
     val sender: KafkaSender<String, String>,
-    val properties: NotifierServerProperties
+    val properties: NotifierServerProperties,
+    val standaloneKafkaReceiverFactory: StandaloneKafkaReceiverFactory
 ) {
+
+    val matcher: Matcher = Matcher()
 
     @MessageMapping("notify")
     fun notify(notification: String): Mono<Void> {
-        logger.info("got notification $notification")
+        logger.debug("got notification $notification")
         return send(notification).then()
     }
 
@@ -33,19 +36,28 @@ class NotifierController(
 
     @MessageMapping("shared/subscribe")
     fun subscribeShared(pattern : String): Flux<String> {
-        logger.info("got a shared subscribe request, pattern: $pattern")
+        logger.debug("got a shared subscribe request, pattern: [$pattern]")
         return Flux.create({ emitter: FluxSink<String> ->
             addEmitter(pattern, emitter)
         }, FluxSink.OverflowStrategy.ERROR)
     }
 
     @MessageMapping("standalone/subscribe")
-    fun subscribeStandalone(pattern : String): Flux<String> {
-        logger.info("got a standalone subscribe request, pattern: $pattern")
-        return Flux.create({ emitter: FluxSink<String> ->
-            addEmitter(pattern, emitter)
-        }, FluxSink.OverflowStrategy.ERROR)
+    fun subscribeStandalone(msg : String): Flux<String> {
+        val pattern = msg.tokenized()
+        logger.debug("got a standalone subscribe request, pattern: $pattern")
+        return standaloneKafkaReceiverFactory.create()
+            .receive()
+            .map { record -> record.value() }
+            .filter { value -> matcher.match(pattern, value.tokenized()) }
+            .doOnNext {
+                logger.debug("standalone dispatch notification [$it] because of subscription $pattern")
+            }.doFinally {
+                logger.debug("standalone subscriber [$pattern] is closed ($it)")
+            }
     }
+
+    private fun String.tokenized() = this.split(Regex("\\s+"))
 
     private fun send(notification: String): Flux<SenderResult<Int>> =
         sender.send(Mono.just(SenderRecord.create(ProducerRecord(properties.topic, notification, notification), 1)))

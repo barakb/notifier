@@ -31,7 +31,6 @@ class NotifierProcessor(
                 val childSpan: Span = builder.name("notifySubscribers").tag("event", record.value()).start()
                 val spanAndScope = SpanAndScope(childSpan, tracer.withSpan(childSpan))
                 spanAndScope.use {
-                    logger.info("notify subscribers")
                     notifySubscribers(record.value(), subscribers)
                 }
 //                }
@@ -50,8 +49,8 @@ class NotifierProcessor(
 
     @NewSpan
     fun emit(subscription: Subscription, notification: String) {
-        logger.info("emitting $notification")
         try {
+            logger.debug("shared dispatch notification [$notification] because of subscription ${subscription.pattern}")
             subscription.emitter.next(notification)
         } catch (e: Exception) {
             logger.error(e.toString(), e)

@@ -1,12 +1,14 @@
 package com.totango.notifier.example
 
 import com.totango.notifier.client.Notifier
+import com.totango.notifier.client.SubscriberMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import reactor.core.Disposable
 
 @SpringBootApplication
 class NotifierApplication {
@@ -21,24 +23,31 @@ class NotifierApplication {
 //        val t = T()
 //        t.exportProd()
 //        t.exportEU()
-        logger.info("subscribe on *")
-        val disposable = notifier.subscribe("*").doOnNext{
-            logger.info("subscriber got $it")
+        logger.debug("subscribe on *")
+        val disposable: Disposable = notifier.subscribe("*").doOnNext{
+            logger.debug("shared     subscriber got $it")
         }.subscribe()
 
-        logger.info("notify FOO")
+        logger.debug("subscribing standalone subscriber on FOO *")
+        val standAloneDisposable: Disposable = notifier.subscribe("FOO *", SubscriberMode.Standalone).doOnNext{
+            logger.debug("standalone subscriber got $it")
+        }.subscribe()
+
+
+        logger.debug("notify FOO")
         notifier.notify("foo").block()
 
-        logger.info("oneway A ONE WAY")
+        logger.debug("oneway A ONE WAY")
         notifier.oneway("a one way").block()
 
-        logger.info("notify FOO")
-        notifier.notify("foo").block()
+        logger.debug("notify FOO AND BAR")
+        notifier.notify("foo and bar").block()
 
-        logger.info("sleeping one second")
+        logger.debug("sleeping one second")
         Thread.sleep(1000)
         disposable.dispose()
-        logger.info("Done")
+        standAloneDisposable.dispose()
+        logger.debug("Done")
 
     }
 
