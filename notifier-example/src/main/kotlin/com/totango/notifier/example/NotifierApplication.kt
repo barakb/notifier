@@ -18,16 +18,25 @@ class NotifierApplication {
         }
 
     fun notify(notifier: Notifier){
-        notifier.notify("foo").block()
-        logger.info("notify")
-        notifier.oneway("a one way").block()
-        logger.info("oneway")
+//        val t = T()
+//        t.exportProd()
+//        t.exportEU()
+        logger.info("subscribe on *")
         val disposable = notifier.subscribe("*").doOnNext{
             logger.info("subscriber got $it")
         }.subscribe()
-        logger.info("notify again")
+
+        logger.info("notify FOO")
         notifier.notify("foo").block()
-        Thread.sleep(30000)
+
+        logger.info("oneway A ONE WAY")
+        notifier.oneway("a one way").block()
+
+        logger.info("notify FOO")
+        notifier.notify("foo").block()
+
+        logger.info("sleeping one second")
+        Thread.sleep(1000)
         disposable.dispose()
         logger.info("Done")
 

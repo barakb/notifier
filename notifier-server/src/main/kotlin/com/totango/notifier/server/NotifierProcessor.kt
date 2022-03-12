@@ -1,26 +1,45 @@
 package com.totango.notifier.server
 
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cloud.sleuth.Span
+import org.springframework.cloud.sleuth.SpanAndScope
+import org.springframework.cloud.sleuth.Tracer
+import org.springframework.cloud.sleuth.annotation.NewSpan
+import org.springframework.cloud.sleuth.propagation.Propagator
 import org.springframework.stereotype.Component
 import reactor.core.Disposable
 import reactor.kafka.receiver.KafkaReceiver
 
+
 @Component
 class NotifierProcessor(
     val subscribers: Subscribers,
-    val receiver: KafkaReceiver<String, String>
+    val receiver: KafkaReceiver<String, String>,
+    val tracer: Tracer,
+    val extractor: Propagator.Getter<ConsumerRecord<*, *>>,
+    val propagator: Propagator
 ) {
 
-    val matcher : Matcher = Matcher()
+    val matcher: Matcher = Matcher()
 
     fun process(): Disposable {
         return receiver.receive()
             .doOnNext { record ->
-                notifySubscribers(record.value(), subscribers) }
+                val builder: Span.Builder = propagator.extract(record, extractor)
+                val childSpan: Span = builder.name("notifySubscribers").tag("event", record.value()).start()
+                val spanAndScope = SpanAndScope(childSpan, tracer.withSpan(childSpan))
+                spanAndScope.use {
+                    logger.info("notify subscribers")
+                    notifySubscribers(record.value(), subscribers)
+                }
+//                }
+            }
             .subscribe()
     }
 
+    @NewSpan
     fun notifySubscribers(msg: String, subscribers: Subscribers) {
         val notification = msg.trim().split(Regex("\\s+"))
         subscribers.all().filter { subscription -> match(notification, subscription) }
@@ -29,7 +48,9 @@ class NotifierProcessor(
             }
     }
 
+    @NewSpan
     fun emit(subscription: Subscription, notification: String) {
+        logger.info("emitting $notification")
         try {
             subscription.emitter.next(notification)
         } catch (e: Exception) {

@@ -21,7 +21,7 @@ class NotifierServerConfiguration {
     fun senderOptions(properties: NotifierServerProperties): SenderOptions<String, String> {
         val props: MutableMap<String, Any> = HashMap()
         props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = properties.bootstrapServers
-        props[ProducerConfig.CLIENT_ID_CONFIG] = "sample-producer"
+        props[ProducerConfig.CLIENT_ID_CONFIG] = "notifier-producer"
         props[ProducerConfig.ACKS_CONFIG] = "all"
         props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
@@ -36,11 +36,11 @@ class NotifierServerConfiguration {
     fun receiverOptions(properties: NotifierServerProperties): ReceiverOptions<String, String> {
         val props: MutableMap<String, Any> = HashMap()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = properties.bootstrapServers
-        props[ConsumerConfig.CLIENT_ID_CONFIG] = "sample-consumer"
-        props[ConsumerConfig.GROUP_ID_CONFIG] = "sample-group"
+        props[ConsumerConfig.CLIENT_ID_CONFIG] = "notifier-consumer"
+        props[ConsumerConfig.GROUP_ID_CONFIG] = "notifier-group"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
         return ReceiverOptions.create<String, String>(props).subscription(listOf(properties.topic))
     }
 

@@ -21,12 +21,12 @@ open class NotifierImpl(private val requester: RSocketRequester) : Notifier {
             .send()
 
 
-
-    override fun subscribe(pattern: String): Flux<Event> =
-        requester.route("subscribe")
+    override fun subscribe(pattern: String, subscriberMode: SubscriberMode): Flux<Event> =
+        requester.route("${subscriberMode.name.lowercase()}/subscribe")
             .data(pattern.normalize())
             .retrieveFlux<String>()
             .map { e -> Event(e) }
+
 
 
     private fun String.normalize(): String = this.uppercase().trim().replace("\\s+", " ")

@@ -11,5 +11,5 @@ interface Notifier {
     @NewSpan
     fun oneway(@SpanTag("notification") notification: String): Mono<Void>
     @NewSpan
-    fun subscribe(@SpanTag("pattern") pattern: String): Flux<Event>
+    fun subscribe(@SpanTag("pattern") pattern: String, subscriberMode: SubscriberMode = SubscriberMode.Shared): Flux<Event>
 }
