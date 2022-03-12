@@ -6,8 +6,7 @@ To provide an easy way for sending and receiving notifications between processes
 
 ### The structure of this project
 1. [A Notifier client spring boot starter](https://github.com/barakb/notifier/tree/master/notifier-client-starter) -- a spring boot started that when include in a spring boot project automatically create a Notifier client
-configuration is done with one property `notifier.server.url` that should set the url (possible behind load balancer) of the Notifier server
-,for example `notifier.server.url=ws://localhost:6565/rsocket`
+configuration is done with one property `notifier.server.url` that should set the url (possible behind load balancer) of the Notifier server, for example `notifier.server.url=ws://localhost:6565/rsocket`
 2. [A Notifier server](https://github.com/barakb/notifier/tree/master/notifier-server) -- a server that use kafka to manage subscription and notifications
 configuration is done using the following properties
 ```properties
