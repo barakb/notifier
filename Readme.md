@@ -64,7 +64,7 @@ val standAloneDisposable: Disposable = notifier.subscribe("FOO *", SubscriberMod
 ```
 
 
-#### An exmple, cleaning Caffeine cache using notifications
+#### An example, cleaning Caffeine cache using notifications
 
 ```kotlin
 package com.totango.notifier.example
