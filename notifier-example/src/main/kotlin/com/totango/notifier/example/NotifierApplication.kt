@@ -17,28 +17,25 @@ import java.util.concurrent.TimeUnit
 class NotifierApplication {
 
     @Bean
-    fun runExample(notifier: Notifier): ApplicationRunner =
-        ApplicationRunner {
-            example(notifier)
-        }
+    fun runExample(notifier: Notifier): ApplicationRunner = ApplicationRunner {
+        example(notifier)
+    }
 
     data class CachedValue(val payload: String)
 
-    private fun example(notifier: Notifier){
-        val cache: Cache<String, CachedValue> = Caffeine.newBuilder()
-            .expireAfterWrite(1, TimeUnit.MINUTES)
-            .maximumSize(100)
-            .build()
+    private fun example(notifier: Notifier) {
+        val cache: Cache<String, CachedValue> =
+            Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).maximumSize(100).build()
         cache.put("880:ACCOUNT1", CachedValue("ACCOUNT1"))
         cache.put("880:ACCOUNT2", CachedValue("ACCOUNT2"))
         cache.put("880:ACCOUNT3", CachedValue("ACCOUNT3"))
 
-        val disposable: Disposable = notifier.subscribe("880 MODIFY ACCOUNT ?").doOnNext{ event ->
-           val key = "${event.tokens[0]}:${event.tokens[3]}"
+        val disposable: Disposable = notifier.subscribe("880 MODIFY ACCOUNT ?").doOnNext { event ->
+            val key = "${event.tokens[0]}:${event.tokens[3]}"
             logger.info("invalidating $key")
             cache.invalidate(key)
             logger.info("cache contains ${cache.asMap()}")
-        }.retry().subscribe()
+        }.doOnError { error -> logger.error("subscriber error $error", error) }.retry().subscribe()
 
         logger.info("cache contains ${cache.asMap()}")
 
