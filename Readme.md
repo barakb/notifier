@@ -136,3 +136,33 @@ fun main(args: Array<String>) {
     runApplication<NotifierApplication>(*args)
 }
 ```
+
+the output of the client should be something like:
+```shell
+2022-03-13 21:18:29.682  INFO [notifier-client,,] 57013 --- [           main] c.t.n.example.NotifierApplication        : cache contains {880:ACCOUNT2=CachedValue(payload=ACCOUNT2), 880:ACCOUNT1=CachedValue(payload=ACCOUNT1), 880:ACCOUNT3=CachedValue(payload=ACCOUNT3)}
+2022-03-13 21:18:30.181  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : invalidating 880:ACCOUNT1
+2022-03-13 21:18:30.184  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : cache contains {880:ACCOUNT2=CachedValue(payload=ACCOUNT2), 880:ACCOUNT3=CachedValue(payload=ACCOUNT3)}
+2022-03-13 21:18:30.185  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : invalidating 880:ACCOUNT3
+2022-03-13 21:18:30.186  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : cache contains {880:ACCOUNT2=CachedValue(payload=ACCOUNT2)}
+2022-03-13 21:18:30.188  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : invalidating 880:ACCOUNT3
+2022-03-13 21:18:30.188  INFO [notifier-client,7eafddc7d9f9fe8e,7eafddc7d9f9fe8e] 57013 --- [actor-tcp-nio-2] c.t.n.example.NotifierApplication        : cache contains {880:ACCOUNT2=CachedValue(payload=ACCOUNT2)}
+2022-03-13 21:18:40.200  INFO [notifier-client,,] 57013 --- [           main] c.t.n.example.NotifierApplication        : at end, cache contains {880:ACCOUNT2=CachedValue(payload=ACCOUNT2)}
+2022-03-13 21:18:40.201 DEBUG [notifier-client,,] 57013 --- [           main] c.t.n.example.NotifierApplication        : Done
+```
+
+and the server
+
+```shell
+2022-03-13 21:21:53.019 DEBUG [notifier,,] 57042 --- [           main] c.t.notifier.server.NotifierApplication  : Event server ready WEBSOCKET 6565 /rsocket 
+2022-03-13 21:21:53.019 DEBUG [notifier,,] 57042 --- [           main] c.t.notifier.server.NotifierApplication  : Zipkin             http://localhost:9411
+2022-03-13 21:21:53.019 DEBUG [notifier,,] 57042 --- [           main] c.t.notifier.server.NotifierApplication  : Jaeger             http://localhost:16686
+2022-03-13 21:22:00.134 DEBUG [notifier,b7621673249fbe5e,24ac47e0ddea97fb] 57042 --- [ctor-http-nio-2] c.t.notifier.server.NotifierController   : got a shared subscribe request, pattern: [880 MODIFY ACCOUNT ?]
+2022-03-13 21:22:00.161 DEBUG [notifier,b7621673249fbe5e,24ac47e0ddea97fb] 57042 --- [ctor-http-nio-2] com.totango.notifier.server.Subscribers  : adding a shared subscription Subscription(pattern=[880, MODIFY, ACCOUNT, ?], emitter=FluxSink(ERROR), uid=c0d0b865-d1cd-40de-a076-81364badfd9d)
+2022-03-13 21:22:00.171 DEBUG [notifier,b2fb5a2d3a242b61,3fc22abec39fa2e0] 57042 --- [ctor-http-nio-2] c.t.notifier.server.NotifierController   : got notification 880 MODIFY ACCOUNT ACCOUNT1
+2022-03-13 21:22:00.281 DEBUG [notifier,b2fb5a2d3a242b61,85878a9d356bc44d] 57042 --- [otifier-group-1] c.t.notifier.server.NotifierProcessor    : shared dispatch notification [880 MODIFY ACCOUNT ACCOUNT1] to subscriber c0d0b865-d1cd-40de-a076-81364badfd9d because of subscription [880, MODIFY, ACCOUNT, ?]
+2022-03-13 21:22:00.302 DEBUG [notifier,7ddd2fba4d1681bf,bdacd00dcd221c3b] 57042 --- [ctor-http-nio-2] c.t.notifier.server.NotifierController   : got notification 880 MODIFY ACCOUNT ACCOUNT3
+2022-03-13 21:22:00.311 DEBUG [notifier,dfeb13611af19fb9,48b16aef9c28566d] 57042 --- [otifier-group-1] c.t.notifier.server.NotifierProcessor    : shared dispatch notification [880 MODIFY ACCOUNT ACCOUNT3] to subscriber c0d0b865-d1cd-40de-a076-81364badfd9d because of subscription [880, MODIFY, ACCOUNT, ?]
+2022-03-13 21:22:00.317 DEBUG [notifier,7ddd2fba4d1681bf,f722e0a826cb207c] 57042 --- [otifier-group-1] c.t.notifier.server.NotifierProcessor    : shared dispatch notification [880 MODIFY ACCOUNT ACCOUNT3] to subscriber c0d0b865-d1cd-40de-a076-81364badfd9d because of subscription [880, MODIFY, ACCOUNT, ?]
+2022-03-13 21:22:00.323 DEBUG [notifier,7640da0a5858e66e,3b50eb851e05985e] 57042 --- [ctor-http-nio-2] c.t.notifier.server.NotifierController   : got notification 881 MODIFY ACCOUNT ACCOUNT1
+2022-03-13 21:22:10.332 DEBUG [notifier,b7621673249fbe5e,24ac47e0ddea97fb] 57042 --- [ctor-http-nio-2] com.totango.notifier.server.Subscribers  : removing a shared subscription Subscription(pattern=[880, MODIFY, ACCOUNT, ?], emitter=FluxSink(ERROR), uid=c0d0b865-d1cd-40de-a076-81364badfd9d)
+```

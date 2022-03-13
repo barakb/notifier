@@ -50,7 +50,7 @@ class NotifierProcessor(
     @NewSpan
     fun emit(subscription: Subscription, notification: String) {
         try {
-            logger.debug("shared dispatch notification [$notification] because of subscription ${subscription.pattern}")
+            logger.debug("shared dispatch notification [$notification] to subscriber ${subscription.uid} because of subscription ${subscription.pattern}")
             subscription.emitter.next(notification)
         } catch (e: Exception) {
             logger.error(e.toString(), e)
