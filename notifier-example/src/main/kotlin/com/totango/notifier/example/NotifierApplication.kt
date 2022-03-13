@@ -24,7 +24,7 @@ class NotifierApplication {
 
     data class CachedValue(val payload: String)
 
-    fun example(notifier: Notifier){
+    private fun example(notifier: Notifier){
         val cache: Cache<String, CachedValue> = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .maximumSize(100)

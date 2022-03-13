@@ -37,11 +37,11 @@ interface Notifier {
 ```
 
 Sending notification can be done in 2 ways
-1. Waiting for the notification is written to the kafka topic
+1. sending and waiting for the notification to be written to the kafka topic
 ```kotlin
 notifier.notify("foo")
 ```
-2. Waiting only for the notification to be sent to the server
+2. sending and not waiting
 ```kotlin
 notifier.oneway("a one way")
 ```
@@ -93,7 +93,7 @@ class NotifierApplication {
 
     data class CachedValue(val payload: String)
 
-    fun example(notifier: Notifier){
+    private fun example(notifier: Notifier){
         val cache: Cache<String, CachedValue> = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .maximumSize(100)
